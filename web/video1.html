@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,
+            maximum-scale=0.9, user-scalable=0">
+        <meta charset="UTF-8">
+        <title> CREADOR DE DATOS </title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body>
+        <div id="content"> 
+            <h1> CREADOR DE DATOS</h1>
+            <div>  
+                <input id="student" type="text"
+                    placeholder="Escribe tu nombre"/>
+
+                <span id="instructions"> </span>
+                <button id="advanceBtn" onclick="start();">
+                    COMIENZA
+                 </button>
+            </div>
+            <br>
+            <div id="sketchPadContainer"
+                style="visibility: hidden;"></div> 
+
+        </div>
+        <script src="js/draw.js"></script>
+        <script src="js/sketchPad.js"></script>
+        
+        <script>
+            let index=0;
+            const labels=["Nube","Corazón","Manzana", "Arbol", "Casa", "Pi"];
+            const data={
+                student:null,
+                session:new Date().getTime(),
+                drawings:{}
+            };
+
+
+
+            const sketchPad=
+                new SketchPad(sketchPadContainer);
+
+            function start(){
+                if(student.value==""){
+                    alert("Por favor escribe tu nombre primero!")
+                    return;
+                }
+                data.student=student.value;
+                student.style.display="none";
+                sketchPadContainer.style.visibility="visible";
+                const label=labels[index];
+                instructions.innerHTML="Por favor dibuja: "+label;
+                advanceBtn.innerHTML="NEXT";
+                advanceBtn.onclick=next;
+            }
+
+
+        function next(){
+            if(sketchPad.paths.length==0){
+                alert("¡Dibuja primero!");
+                return;
+            }
+
+            const label=labels[index];
+            data.drawings[label]=sketchPad.paths;
+            sketchPad.reset();
+            index++;
+            if(index<labels.length){
+                const nextLabel=labels[index];
+                instructions.innerHTML="Por favor dibuja: "+nextLabel;
+
+             }else{
+                sketchPadContainer.style.visibility="hidden";
+                instructions.innerHTML="Muchas gracias por tu apoyo! A continuación, al dar clic en el botón se decargará un archivo con extensión JSON a tu dispositivo."
+                advanceBtn.innerHTML="Guardar";
+                advanceBtn.onclick=save;
+             }
+           
+
+        }
+
+        function save(){
+            advanceBtn.style.display='none';
+                   instructions.innerHTML= "Por favor sube el archivo que acabas de descargar al siguiente <a href='https://forms.gle/eTDnKmfk5khCgtrm8'>FORMULARIO</a>"
+            const element=document.createElement('a');
+            element.setAttribute('href',
+                'data:text/plain;charset=utf-8,'+
+                encodeURIComponent(JSON.stringify(data))
+            );
+
+            const fileName=data.session+".json";
+            element.setAttribute('download', fileName);
+
+            element.style.display='none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+                
+            
+        }
+        </script>
+
+
+    </body>
+</html>
